@@ -38,3 +38,5 @@ This generates a lift or dipping force perpendicular to the direction of travel 
  Tech Stack
 * Language: Python 3
 * Library: Pygame
+
+![Aero ballistics 2D](ballistics.png)
