@@ -40,3 +40,27 @@ This generates a lift or dipping force perpendicular to the direction of travel 
 * Library: Pygame
 
 ![Aero ballistics 2D](ballistics.png)
+
+
+
+
+# AeroStrike: Extreme Skies 🚀
+
+A high-performance 2D arcade space shooter engine built from scratch using Python and Pygame. This project serves as an implementation study of systems programming, modular software architecture, and real-time physics decoupling.
+
+ 🛠️ Core Engineering Features
+
+Delta-Time Physics Consistent Engine (60FPS): Decoupled frame-rate rendering from physics calculations. This ensures identical entity velocity, laser trajectories, and gameplay mechanics across varying CPU hardware configurations.
+
+
+Modular Software Architecture: Refactored a monolithic script into standalone, decoupled runtime subsystems (e.g., dedicated audio initialization modules) to lower global memory overhead and maximize debugging scalability.
+
+
+Advanced Kinematics & Sinusoidal Path Variables: Programmed autonomous enemy entities utilizing trigonometric waves (`math.sin`) to generate complex, fluid horizontal swaying vectors during vertical descent.
+
+
+Robust Collision Detection (AABB): Implemented precise Axis-Aligned Bounding Box collision matrices to track intersection vectors between high-velocity laser arrays and active enemy matrices.
+
+
+
+![main.py](extremeskies.png)
