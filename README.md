@@ -1,8 +1,8 @@
 
-
-
 1. 3D Cyberpunk Physics Engine (projectile_sim.py)
 A continuous numerical solver for ballistics.
+
+
 
 Physics: Computes gravitational pull (g) integrated with aerodynamic drag coefficients (C_d).
 
@@ -17,17 +17,27 @@ Utility: Scalable to drone path planning and high-resistance trajectory modeling
 
 
 
+
+
+
+
+
 2. AeroBallistics-2D
 
 A real-time 2D physics engine simulating projectile trajectories under the influence of air resistance, gravity, and spin curve mechanics.
+
 
  The Science Behind the Engine
 
 The engine calculates forces frame-by-frame based on real-world fluid dynamics scale where 110 pixels equals 1 meter.
 
 
+
+
 1. Aerodynamic Drag
 This accounts for air resistance pushing against the ball as it travels forward. It uses standard air density (1.225 kg/m3) and a realistic sphere drag coefficient (0.45) to slow the ball down naturally over time.
+
+
 
 
 3. Magnus Effect (Spin Curve)
@@ -51,6 +61,8 @@ This generates a lift or dipping force perpendicular to the direction of travel 
 
 
 
+
+
 # AeroStrike: Extreme Skies 
 
 A high-performance 2D arcade space shooter engine built from scratch using Python and Pygame. This project serves as an implementation study of systems programming, modular software architecture, and real-time physics decoupling.
@@ -61,13 +73,16 @@ A high-performance 2D arcade space shooter engine built from scratch using Pytho
 1. Delta-Time Physics Consistent Engine (60FPS): Decoupled frame-rate rendering from physics calculations. This ensures identical entity velocity, laser trajectories, and gameplay mechanics across varying CPU hardware configurations.
 
 
+
 2. Modular Software Architecture: Refactored a monolithic script into standalone, decoupled runtime subsystems (e.g., dedicated audio initialization modules) to lower global memory overhead and maximize debugging scalability.
+
 
 
 3. Advanced Kinematics & Sinusoidal Path Variables: Programmed autonomous enemy entities utilizing trigonometric waves (`math.sin`) to generate complex, fluid horizontal swaying vectors during vertical descent.
 
 
-4. Robust Collision Detection (AABB): Implemented precise Axis-Aligned Bounding Box collision matrices to track intersection vectors between high-velocity laser arrays and active enemy matrices.
+
+5. Robust Collision Detection (AABB): Implemented precise Axis-Aligned Bounding Box collision matrices to track intersection vectors between high-velocity laser arrays and active enemy matrices.
 
 
 
@@ -75,7 +90,11 @@ A high-performance 2D arcade space shooter engine built from scratch using Pytho
 
 Programming Language: Python 3.11+ — Leveraged for clean, high-level object-oriented engine architecture and rapid implementation of math matrices.
 
+
+
 Graphics Engine Framework: Pygame CE (Community Edition) — Used to manage the low-level multimedia hardware layer, window rendering, and real-time input matrices.
+
+
 
 Version Control Architecture: Git & GitHub — Utilized for continuous integration, managing codebase refactoring, and tracking deployment history with professional commit standards.
 
@@ -87,6 +106,7 @@ Vector Kinematics & Linear Algebra: Standard coordinate geometry used for veloci
 
  
 Trigonometric & Non-Linear Functions: Utilized math.sin(), math.cos(), and natural constants like Euler's number (e via math.exp) to calculate coordinate-space shifts and real-time kinetic impact impulses.
+
 
 
 
