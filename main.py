@@ -13,7 +13,7 @@ pygame.init()
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("AeroStrike: Extreme Skies [v2.5 - Nexus State Engine]")
+pygame.display.set_caption("AeroStrike: Extreme Skies [v2.6 - Kinetic Matrix Engine]")
 
 clock = pygame.time.Clock()
 FPS = 60  
@@ -39,7 +39,7 @@ def run_loading_screen():
         "MOUNTING GRAPHICS BUFFER OVERLAYS...",
         "DECOUPLING DELTA-TIME CORE REGISTERS...",
         "COUCHING AUDIO MODULE INITIALIZATION...",
-        "LAUNCHING COMBAT SIMULATION CORE v2.0..."
+        "LAUNCHING COMBAT SIMULATION CORE v2.6..."
     ]
     
     progress = 0
@@ -88,7 +88,6 @@ def run_loading_screen():
         flash_timer += 1
         screen.fill((5, 5, 10))
         
-        # Tech Background Grid
         for i in range(0, SCREEN_WIDTH, 40):
             pygame.draw.line(screen, (15, 15, 30), (i, 0), (i, SCREEN_HEIGHT))
         for j in range(0, SCREEN_HEIGHT, 40):
@@ -97,7 +96,6 @@ def run_loading_screen():
         title_surf = font_large.render("SYSTEM INITIALIZED", True, (0, 255, 150))
         screen.blit(title_surf, (SCREEN_WIDTH//2 - title_surf.get_width()//2, 180))
         
-        # Flashing technical prompt text
         if (flash_timer // 30) % 2 == 0:
             prompt_surf = font_small.render(">> PRESS ANY KEY TO ENGAGE SIMULATION <<", True, (255, 255, 255))
         else:
@@ -118,10 +116,20 @@ def run_loading_screen():
 run_loading_screen()
 
 # ==========================================
-# 3. GAME VARIABLES & ADVANCED VISUAL SYSTEMS
+# 3. GAME VARIABLES & VISUAL CHASSIS STATES
 # ==========================================
 engine_particles = []
 explosion_particles = []
+
+# --- SCREEN SHAKE SYSTEM STATES ---
+screen_shake_intensity = 0.0  
+screen_shake_decay = 5.0      
+camera_offset_x = 0
+camera_offset_y = 0
+
+def trigger_screen_shake(intensity):
+    global screen_shake_intensity
+    screen_shake_intensity = max(screen_shake_intensity, intensity)
 
 def spawn_explosion(x, y):
     for _ in range(25):
@@ -152,14 +160,12 @@ lasers = []
 laser_cooldown = 0
 COOLDOWN_MAX = 12  
 
-# --- NEW PROGRESSIVE LEVEL MECHANICS ---
+# Progressive Level Mechanics
 current_level = 1
 enemies_killed_this_level = 0
 enemies_spawned_count = 0
 
-# Dynamic Helper to spawn an enemy scaled exactly to current level limits
 def create_level_enemy(level_num):
-    # Base speeds scale slightly as the levels advance
     speed_min = 100.0 + (level_num * 15)
     speed_max = 180.0 + (level_num * 25)
     return {
@@ -171,7 +177,6 @@ def create_level_enemy(level_num):
         'angle': random.uniform(0, 3.14)
     }
 
-# Initialization of Level 1 parameters (Starts with just 2 slow tactical units!)
 enemies = []
 enemies_required_to_advance = 4  
 max_simultaneous_enemies = 2     
@@ -181,7 +186,7 @@ for _ in range(max_simultaneous_enemies):
     enemies_spawned_count += 1
 
 score = 0
-level_banner_timer = 180  # Frame duration to display "LEVEL X" UI alert at startup
+level_banner_timer = 180  
 
 # ==========================================
 # 4. ENGINE RUNTIME LOOP
@@ -198,6 +203,17 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+    # --- CALCULATE SCREEN SHAKE IMPULSE ---
+    if screen_shake_intensity > 0.1:
+        screen_shake_intensity -= screen_shake_intensity * screen_shake_decay * dt
+        shake_angle = random.uniform(0, 2 * math.pi)
+        camera_offset_x = int(math.cos(shake_angle) * screen_shake_intensity)
+        camera_offset_y = int(math.sin(shake_angle) * screen_shake_intensity)
+    else:
+        screen_shake_intensity = 0.0
+        camera_offset_x = 0
+        camera_offset_y = 0
+
     keys = pygame.key.get_pressed()
     if (keys[pygame.K_LEFT] or keys[pygame.K_a]) and player_x > 0:
         player_x -= player_speed * dt
@@ -206,7 +222,7 @@ while running:
         
     player_wrapper = PlayerMock(player_x + player_width // 2, player_y, 600.0)
 
-    # Laser Array Execution
+    # Weapon Space Fires
     if keys[pygame.K_SPACE] and laser_cooldown == 0:
         spawn_offsets = [6, player_width - 10]
         for offset in spawn_offsets:
@@ -265,7 +281,7 @@ while running:
         if ep[5] <= 0:
             explosion_particles.remove(ep)
 
-    # --- 4B. AUTO-ASSIST WEAPON UPDATE MECHANICS ---
+    # --- AUTO-ASSIST VECTOR BLENDING ---
     for laser in lasers[:]:
         target = laser['target']
         
@@ -289,25 +305,23 @@ while running:
         if laser['y'] < 0 or laser['x'] < 0 or laser['x'] > SCREEN_WIDTH:
             lasers.remove(laser)
 
-    # --- 4C. DYNAMIC LEVEL STATE MONITOR ---
+    # --- SECTOR MONITOR MATRIX ---
     if enemies_killed_this_level >= enemies_required_to_advance:
         current_level += 1
         enemies_killed_this_level = 0
         enemies_spawned_count = 0
-        # Scale parameters upward incrementally
         max_simultaneous_enemies = min(7, 2 + current_level) 
         enemies_required_to_advance = 4 + (current_level * 2)
-        level_banner_timer = 180  # Reset flash banner trigger
+        level_banner_timer = 180  
         enemies.clear()
         lasers.clear()
 
-    # Fill the sky mapping up to the dynamic level capacity limits
     while len(enemies) < max_simultaneous_enemies and enemies_spawned_count < enemies_required_to_advance:
         enemies.append(create_level_enemy(current_level))
         enemies_spawned_count += 1
 
-    # --- 4D. PROXIMITY SPEED DAMPENING ENEMY MECHANICS ---
-    for enemy in enemies:
+    # --- DAMPENING MATRIX AND COLLISIONS ---
+    for enemy in enemies[:]:
         dx = (player_x + player_width // 2) - (enemy['x'] + 20)
         dy = (player_y + player_height // 2) - (enemy['y'] + 20)
         distance_sq = dx**2 + dy**2
@@ -329,15 +343,16 @@ while running:
         enemy['y'] += enemy['vy'] * dt
 
         if enemy['y'] > SCREEN_HEIGHT:
-            # Recycle standard tracking position
             enemy['x'] = random.randint(0, SCREEN_WIDTH - 45)
             enemy['y'] = random.randint(-150, -50)
             player_health -= 10  
+            trigger_screen_shake(12.0)  # Perimeter hull impact shake
 
         if (enemy['x'] < player_x + player_width and enemy['x'] + 40 > player_x and
             enemy['y'] < player_y + player_height and enemy['y'] + 40 > player_y):
             spawn_explosion(enemy['x'] + 20, enemy['y'] + 20)
             player_health -= 20
+            trigger_screen_shake(22.0)  # Critical structural collision shake
             
             if len(enemies) + enemies_killed_this_level < enemies_required_to_advance:
                 enemy['x'] = random.randint(0, SCREEN_WIDTH - 45)
@@ -346,56 +361,70 @@ while running:
                 enemies.remove(enemy)
                 enemies_killed_this_level += 1
 
-    # Intersection matrices
+    # Laser Intersection Matrices
     for laser in lasers[:]:
-        for enemy in enemies:
+        for enemy in enemies[:]:
             if (laser['x'] > enemy['x'] and laser['x'] < enemy['x'] + 40 and
                 laser['y'] > enemy['y'] and laser['y'] < enemy['y'] + 40):
                 
                 spawn_explosion(enemy['x'] + 20, enemy['y'] + 20)
+                trigger_screen_shake(8.0)  # Kinetic kinetic detonation shake
                 if explosion_sound:
                     explosion_sound.play()
                 
                 if laser in lasers:
                     lasers.remove(laser)
                 
-                enemies.remove(enemy)
+                if enemy in enemies:
+                    enemies.remove(enemy)
                 enemies_killed_this_level += 1
                 score += 150
                 break
 
-    # --- 4E. GRAPHICS RENDERING LAYER ---
+    # ==========================================
+    # 5. GRAPHICS RENDERING SYSTEM (CAMERA TRANSLATED)
+    # ==========================================
+    
+    # Grid Backdrop Integration
+    for i in range(0, SCREEN_WIDTH, 40):
+        pygame.draw.line(screen, (15, 15, 30), (i + camera_offset_x, 0 + camera_offset_y), (i + camera_offset_x, SCREEN_HEIGHT + camera_offset_y))
+    for j in range(0, SCREEN_HEIGHT, 40):
+        pygame.draw.line(screen, (15, 15, 30), (0 + camera_offset_x, j + camera_offset_y), (SCREEN_WIDTH + camera_offset_x, j + camera_offset_y))
+
+    # Engine Trails
     for p in engine_particles:
-        pygame.draw.circle(screen, (0, 200, 255), (int(p[0]), int(p[1])), int(p[4]))
+        pygame.draw.circle(screen, (0, 200, 255), (int(p[0]) + camera_offset_x, int(p[1]) + camera_offset_y), int(p[4]))
 
+    # Kinetic Explosion Elements
     for ep in explosion_particles:
-        pygame.draw.circle(screen, ep[6], (int(ep[0]), int(ep[1])), int(ep[4]))
+        pygame.draw.circle(screen, ep[6], (int(ep[0]) + camera_offset_x, int(ep[1]) + camera_offset_y), int(ep[4]))
 
-    pygame.draw.rect(screen, (30, 50, 90), (player_x + 16, player_y + 10, 24, 38), border_radius=3)
+    # Main Fighter Chassis
+    pygame.draw.rect(screen, (30, 50, 90), (player_x + 16 + camera_offset_x, player_y + 10 + camera_offset_y, 24, 38), border_radius=3)
     pygame.draw.polygon(screen, (0, 180, 255), [
-        (player_x + player_width // 2, player_y),
-        (player_x, player_y + player_height - 10),
-        (player_x + player_width, player_y + player_height - 10)
+        (player_x + player_width // 2 + camera_offset_x, player_y + camera_offset_y),
+        (player_x + camera_offset_x, player_y + player_height - 10 + camera_offset_y),
+        (player_x + player_width + camera_offset_x, player_y + player_height - 10 + camera_offset_y)
     ])
-    pygame.draw.ellipse(screen, (0, 255, 200), (player_x + 23, player_y + 12, 10, 18))
+    pygame.draw.ellipse(screen, (0, 255, 200), (player_x + 23 + camera_offset_x, player_y + 12 + camera_offset_y, 10, 18))
 
+    # Weapon Lasers
     for laser in lasers:
-        pygame.draw.rect(screen, (0, 255, 120), (int(laser['x']), int(laser['y']), 4, 14))
+        pygame.draw.rect(screen, (0, 255, 120), (int(laser['x']) + camera_offset_x, int(laser['y']) + camera_offset_y, 4, 14))
 
+    # Tactical Aggressor Modules
     for enemy in enemies:
-        pygame.draw.rect(screen, (220, 40, 70), (int(enemy['x']), int(enemy['y']), 40, 40), border_radius=6)
-        pygame.draw.circle(screen, (255, 255, 255), (int(enemy['x'] + 20), int(enemy['y'] + 20)), 8)
-        pygame.draw.circle(screen, (0, 0, 0), (int(enemy['x'] + 20), int(enemy['y'] + 20)), 4)
+        pygame.draw.rect(screen, (220, 40, 70), (int(enemy['x']) + camera_offset_x, int(enemy['y']) + camera_offset_y, 40, 40), border_radius=6)
+        pygame.draw.circle(screen, (255, 255, 255), (int(enemy['x'] + 20) + camera_offset_x, int(enemy['y'] + 20) + camera_offset_y), 8)
+        pygame.draw.circle(screen, (0, 0, 0), (int(enemy['x'] + 20) + camera_offset_x, int(enemy['y'] + 20) + camera_offset_y), 4)
 
-    # UI Dashboard HUD Layers
+    # Static HUD Layer (Intentionally left un-offset so text doesn't shake)
     score_surf = font_small.render(f"SYSTEM SCORE // {score:06d}", True, (255, 255, 255))
     screen.blit(score_surf, (20, 20))
     
-    # Progress towards next level indicator
     lvl_surf = font_small.render(f"SECTOR LEVEL: {current_level} [{enemies_killed_this_level}/{enemies_required_to_advance}]", True, (0, 255, 200))
     screen.blit(lvl_surf, (20, 45))
     
-    # Shield HUD Draw Meter
     pygame.draw.rect(screen, (40, 40, 60), (SCREEN_WIDTH - 170, 20, 150, 16), border_radius=4)
     if player_health > 0:
         health_color = (0, 255, 150) if player_health > 40 else (255, 50, 50)
@@ -403,11 +432,9 @@ while running:
     hp_lbl = font_small.render("SHIELDS", True, (255, 255, 255))
     screen.blit(hp_lbl, (SCREEN_WIDTH - 250, 20))
 
-    # Splashing "Level Up" Announcement Text
     if level_banner_timer > 0:
         level_banner_timer -= 1
         banner_surf = font_large.render(f"ENTERING SECTOR {current_level}", True, (255, 215, 0))
-        # Draw soft shadow text
         shadow_surf = font_large.render(f"ENTERING SECTOR {current_level}", True, (50, 30, 0))
         screen.blit(shadow_surf, (SCREEN_WIDTH//2 - banner_surf.get_width()//2 + 2, SCREEN_HEIGHT//3 + 2))
         screen.blit(banner_surf, (SCREEN_WIDTH//2 - banner_surf.get_width()//2, SCREEN_HEIGHT//3))
