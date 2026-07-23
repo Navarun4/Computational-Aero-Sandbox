@@ -125,4 +125,4 @@ Trigonometric & Non-Linear Functions: Utilized math.sin(), math.cos(), and natur
 
 Why this project?: This has been a recent project of mine and i did this to support or help out people in depression, anxiety or stress. The project is still under work as it has to be more optimised but i added things like pomodoro timer, taks organizer, calm sound effects and a stress reducer option too! 
 
-![main.py](sanctuary.png)
+![main.py](sacntuary.png)
