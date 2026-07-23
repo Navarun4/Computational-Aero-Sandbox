@@ -1,4 +1,4 @@
-<img width="928" height="495" alt="image" src="https://github.com/user-attachments/assets/3b791e67-bf19-4a80-a134-f912ff0bad80" />
+
 # 1. 3D Cyberpunk Physics Engine (projectile_sim.py)
 A continuous numerical solver for ballistics.
 
