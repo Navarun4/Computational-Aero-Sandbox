@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sanctuary OS v11.0 // Exam Edition</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #ffffff;
+      overflow: hidden;
+      background: linear-gradient(-45deg, #0a0512, #1d0f2b, #2c0c30, #0f051d, #0a0512);
+      background-size: 400% 400%;
+      animation: ambientWave 15s ease-in-out infinite;
+    }
+
+    @keyframes ambientWave {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .workspace-layout {
+      display: flex;
+      gap: 24px;
+      max-width: 1150px;
+      width: 95%;
+      align-items: stretch;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .panel {
+      flex: 1;
+      display: flex;
+    }
+
+    .sanctuary-card {
+      background: rgba(20, 12, 30, 0.45);
+      border: 1px solid rgba(255, 105, 180, 0.12);
+      border-radius: 24px;
+      padding: 24px;
+      width: 100%;
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .sanctuary-header h1 {
+      font-size: 22px;
+      font-weight: 600;
+      background: linear-gradient(135deg, #ff69b4 0%, #8e2de2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 2px;
+    }
+
+    .sanctuary-header p {
+      color: rgba(255, 255, 255, 0.35);
+      font-size: 10px;
+      letter-spacing: 1px;
+    }
+
+    .telemetry-widget {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* POMODORO TIMER STYLES */
+    .timer-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .pomo-time {
+      font-family: monospace;
+      font-size: 32px;
+      font-weight: bold;
+      color: #00f5d4;
+      letter-spacing: 2px;
+    }
+
+    .pomo-controls {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .pomo-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .pomo-btn:hover {
+      background: #00f5d4;
+      color: #000;
+    }
+
+    /* AUDIO GENERATOR STYLES */
+    .audio-section {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .audio-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    .audio-btn {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 11px;
+      padding: 6px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .audio-btn.active {
+      background: linear-gradient(135deg, #7209b7 0%, #da1b60 100%);
+      color: #ffffff;
+      border-color: #ff69b4;
+    }
+
+    /* BATTERY SECTION */
+    .battery-section {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 10px;
+    }
+
+    .battery-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .battery-slider {
+      width: 100%;
+      -webkit-appearance: none;
+      background: rgba(255, 255, 255, 0.08);
+      height: 6px;
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .battery-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ff69b4;
+      box-shadow: 0 0 10px #ff69b4;
+    }
+
+    .sanctuary-selector {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .selector-btn {
+      width: 100%;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      color: rgba(255, 255, 255, 0.5);
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .selector-btn.active {
+      color: #ffffff;
+      background: linear-gradient(135deg, #da1b60 0%, #7209b7 100%);
+      box-shadow: 0 4px 15px rgba(218, 27, 96, 0.35);
+    }
+
+    .hotkey-legend {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.3);
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    .orb-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      flex: 1;
+      min-height: 80px;
+    }
+
+    .speech-orb {
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ff69b4, #7209b7);
+      box-shadow: 0 0 40px rgba(255, 105, 180, 0.4);
+      animation: floatOrb 4s ease-in-out infinite;
+      transition: all 0.5s ease;
+    }
+
+    @keyframes floatOrb {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .orb-status-display { margin-top: 6px; text-align: center; }
+    .status-badge { font-size: 11px; font-weight: 600; color: #ff69b4; text-transform: uppercase; letter-spacing: 0.8px; }
+
+    .view-panel {
+      display: none;
+      width: 100%;
+      height: 310px;
+    }
+    
+    .view-panel.active {
+      display: block;
+    }
+
+    /* NOTES + QUICK ADD LAYOUT */
+    .notes-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      gap: 10px;
+    }
+
+    .quick-note-wrapper {
+      display: flex;
+      gap: 8px;
+    }
+
+    .quick-note-input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 105, 180, 0.3);
+      border-radius: 10px;
+      padding: 8px 12px;
+      color: #ffffff;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .quick-note-input:focus {
+      border-color: #ff69b4;
+      box-shadow: 0 0 10px rgba(255, 105, 180, 0.2);
+    }
+
+    .quick-note-btn {
+      background: linear-gradient(135deg, #ff69b4 0%, #7209b7 100%);
+      border: none;
+      color: #fff;
+      padding: 0 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .note-area {
+      flex: 1;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 14px;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 13px;
+      line-height: 1.6;
+      resize: none;
+      outline: none;
+    }
+
+    /* SUBJECT PROGRESS & TASK STYLES */
+    .task-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      gap: 10px;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #00f5d4, #00bbf9);
+      transition: width 0.4s ease;
+    }
+
+    .task-input-wrapper { display: flex; gap: 6px; }
+    
+    .subject-select {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      color: #ff69b4;
+      padding: 0 8px;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .task-input { flex: 1; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 8px 12px; color: #ffffff; font-size: 12px; outline: none; }
+    .task-add-btn { background: linear-gradient(135deg, #da1b60 0%, #7209b7 100%); border: none; color: white; padding: 0 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 12px; }
+    .task-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 4px; }
+    
+    .task-item { display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.04); padding: 8px 12px; border-radius: 8px; font-size: 12px; }
+    .task-left { display: flex; align-items: center; gap: 8px; }
+    .subject-tag { font-size: 10px; font-weight: 700; background: rgba(255, 255, 255, 0.08); padding: 2px 6px; border-radius: 4px; color: #00f5d4; }
+    .task-checkbox { cursor: pointer; }
+    .task-text.completed { text-decoration: line-through; color: rgba(255, 255, 255, 0.3); }
+    .task-delete { background: transparent; border: none; color: rgba(255, 105, 180, 0.6); cursor: pointer; font-size: 12px; }
+
+    /* DECOMPRESSION CANVAS & INCINERATOR */
+    .decompression-container { display: flex; flex-direction: column; height: 100%; gap: 10px; }
+    .canvas-wrapper { flex: 1; position: relative; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); }
+    .decompression-canvas { width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); cursor: crosshair; display: block; }
+    .vent-input-wrapper { display: flex; gap: 8px; }
+    .vent-input { flex: 1; background: rgba(255, 71, 126, 0.05); border: 1px solid rgba(255, 71, 126, 0.2); border-radius: 10px; padding: 10px 14px; color: #ffffff; font-size: 12px; outline: none; }
+    .vent-btn { background: linear-gradient(135deg, #ff477e 0%, #ff9f1c 100%); border: none; color: white; padding: 0 16px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 12px; }
+
+    /* AUTO-BREAK DIMMER OVERLAY */
+    .break-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(5, 2, 12, 0.92);
+      backdrop-filter: blur(25px);
+      z-index: 999;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      animation: fadeIn 0.8s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .break-card {
+      text-align: center;
+      max-width: 420px;
+      padding: 36px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(0, 245, 212, 0.3);
+      border-radius: 24px;
+      box-shadow: 0 0 50px rgba(0, 245, 212, 0.15);
+    }
+
+    .break-card h2 { font-size: 26px; color: #00f5d4; margin-bottom: 8px; }
+    .break-card p { font-size: 13px; color: rgba(255, 255, 255, 0.6); line-height: 1.5; margin-bottom: 20px; }
+    
+    .break-close-btn {
+      background: linear-gradient(135deg, #00f5d4 0%, #00bbf9 100%);
+      border: none;
+      color: #000;
+      padding: 10px 24px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- FEATURE 3: BREAK SCREEN DIMMER OVERLAY -->
+  <div class="break-overlay" id="breakOverlay">
+    <div class="break-card">
+      <h2>🌱 Study Session Complete!</h2>
+      <p>Great work on that 25-minute sprint. Step away from your desk, stretch your arms, look at something far away, and grab a quick glass of water.</p>
+      <button class="break-close-btn" id="dismissBreakBtn">Resume Sanctuary OS</button>
+    </div>
+  </div>
+
+  <div class="workspace-layout">
+    
+    <!-- LEFT PANEL: TELEMETRY & STUDY UTILITIES -->
+    <div class="panel">
+      <div class="sanctuary-card">
+        <div class="sanctuary-header">
+          <h1>Sanctuary OS</h1>
+          <p>EXAM REVISION CORE v11.0</p>
+        </div>
+
+        <div class="telemetry-widget">
+          <!-- POMODORO FOCUS TIMER -->
+          <div class="timer-container">
+            <div class="pomo-time" id="pomoDisplay">25:00</div>
+            <div class="pomo-controls">
+              <button class="pomo-btn" id="startPomoBtn">Start</button>
+              <button class="pomo-btn" id="pausePomoBtn">Pause</button>
+              <button class="pomo-btn" id="resetPomoBtn">Reset</button>
+            </div>
+          </div>
+
+          <!-- AUDIO GENERATOR -->
+          <div class="audio-section">
+            <span style="font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase;">Focus Ambient Sound</span>
+            <div class="audio-controls">
+              <button class="audio-btn active" id="audioOffBtn">Off</button>
+              <button class="audio-btn" id="audioRainBtn">🌧 Rain</button>
+              <button class="audio-btn" id="audioPinkBtn">📻 Noise</button>
+            </div>
+          </div>
+          
+          <div class="battery-section">
+            <div class="battery-header-row">
+              <span style="font-size: 10px; color: rgba(255, 255, 255, 0.5); text-transform: uppercase;">Mental Energy</span>
+              <span id="batteryPercent" style="font-size: 12px; font-weight: 600; color: #ff69b4;">80%</span>
+            </div>
+            <input type="range" min="0" max="100" value="80" class="battery-slider" id="batterySlider">
+          </div>
+        </div>
+
+        <div class="sanctuary-selector">
+          <button class="selector-btn active" id="tab1Btn" data-target="notes-panel" data-bg="radial-gradient(circle at 30% 30%, #ff69b4, #7209b7)" data-color="#ff69b4" data-badge="Workspace Notes">📝 Study Notes [Alt+1]</button>
+          <button class="selector-btn" id="tab2Btn" data-target="tasks-panel" data-bg="radial-gradient(circle at 30% 30%, #00f5d4, #00bbf9)" data-color="#00f5d4" data-badge="Syllabus Tracker">🎯 Exam Revision [Alt+2]</button>
+          <button class="selector-btn" id="tab3Btn" data-target="reset-panel" data-bg="radial-gradient(circle at 30% 30%, #ff9f1c, #ff477e)" data-color="#ff9f1c" data-badge="Decompression Void">⚡ Mind Reset Void [Alt+3]</button>
+        </div>
+
+        <div class="hotkey-legend">⌨️ Space: Timer | Alt+M: Audio</div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: WORKSPACE VIEWPORTS -->
+    <div class="panel">
+      <div class="sanctuary-card">
+        
+        <div class="orb-container">
+          <div class="speech-orb" id="visualOrb"></div>
+          <div class="orb-status-display">
+            <div class="status-badge" id="statusBadge">Workspace Notes</div>
+          </div>
+        </div>
+
+        <!-- VIEW PORT 1: NOTES + FEATURE 2 (QUICK NOTE STAMPER) -->
+        <div class="view-panel active" id="notes-panel">
+          <div class="notes-container">
+            <div class="quick-note-wrapper">
+              <input type="text" class="quick-note-input" id="quickNoteInput" placeholder="⚡ Quick class tip (Press Enter to auto-timestamp)...">
+              <button class="quick-note-btn" id="quickNoteBtn">Stamp</button>
+            </div>
+            <textarea class="note-area" id="noteArea" placeholder="Jot down quick class notes or exam formulas freely..."></textarea>
+          </div>
+        </div>
+
+        <!-- VIEW PORT 2: SYLLABUS REVISION TRACKER -->
+        <div class="view-panel" id="tasks-panel">
+          <div class="task-container">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
+                <span style="color: rgba(255,255,255,0.5);">Syllabus Covered</span>
+                <span id="progressPercent" style="color: #00f5d4; font-weight: 600;">0%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressFill"></div>
+              </div>
+            </div>
+
+            <div class="task-input-wrapper">
+              <select class="subject-select" id="subjectSelect">
+                <option value="MATH">Math</option>
+                <option value="PHYS">Physics</option>
+                <option value="CODE">Coding</option>
+                <option value="GEN">General</option>
+              </select>
+              <input type="text" class="task-input" id="newTaskInput" placeholder="Add topic/chapter to revise...">
+              <button class="task-add-btn" id="addTaskBtn">Add</button>
+            </div>
+            <div class="task-list" id="taskListContainer"></div>
+          </div>
+        </div>
+
+        <!-- VIEW PORT 3: THE RESET VOID -->
+        <div class="view-panel" id="reset-panel">
+          <div class="decompression-container">
+            <div class="canvas-wrapper">
+              <canvas class="decompression-canvas" id="sandboxCanvas"></canvas>
+            </div>
+            <div class="vent-input-wrapper">
+              <input type="text" class="vent-input" id="ventInput" placeholder="Type an exam stress thought and hit burn to incinerate it...">
+              <button class="vent-btn" id="ventBtn">Burn It</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // DATA LAYER & PERSISTENCE
+    let currentBattery = localStorage.getItem('sanc_battery') ? parseInt(localStorage.getItem('sanc_battery')) : 80;
+    let notesData = localStorage.getItem('sanc_notes') || '';
+    let tasks = localStorage.getItem('sanc_tasks') ? JSON.parse(localStorage.getItem('sanc_tasks')) : [
+      { id: 1, subject: "CODE", text: "Complete Sanctuary OS upgrades", completed: true },
+      { id: 2, subject: "MATH", text: "Revise Chapter 3 Formulas", completed: false }
+    ];
+
+    function saveToStorage() {
+      localStorage.setItem('sanc_battery', currentBattery);
+      localStorage.setItem('sanc_notes', document.getElementById('noteArea').value);
+      localStorage.setItem('sanc_tasks', JSON.stringify(tasks));
+    }
+
+    // 1. POMODORO FOCUS TIMER ENGINE WITH BREAK DIMMER
+    let pomoTime = 25 * 60;
+    let pomoTimer = null;
+    let isPomoRunning = false;
+
+    const pomoDisplay = document.getElementById('pomoDisplay');
+    const startPomoBtn = document.getElementById('startPomoBtn');
+    const pausePomoBtn = document.getElementById('pausePomoBtn');
+    const resetPomoBtn = document.getElementById('resetPomoBtn');
+    const breakOverlay = document.getElementById('breakOverlay');
+    const dismissBreakBtn = document.getElementById('dismissBreakBtn');
+
+    function updatePomoDisplay() {
+      const mins = String(Math.floor(pomoTime / 60)).padStart(2, '0');
+      const secs = String(pomoTime % 60).padStart(2, '0');
+      pomoDisplay.textContent = `${mins}:${secs}`;
+    }
+
+    function togglePomoTimer() {
+      if (!isPomoRunning) {
+        isPomoRunning = true;
+        pomoTimer = setInterval(() => {
+          if (pomoTime > 0) {
+            pomoTime--;
+            updatePomoDisplay();
+          } else {
+            clearInterval(pomoTimer);
+            isPomoRunning = false;
+            // Trigger Auto-Break Dimmer
+            breakOverlay.style.display = 'flex';
+            updateBatteryUI(Math.min(100, currentBattery + 20));
+          }
+        }, 1000);
+      } else {
+        clearInterval(pomoTimer);
+        isPomoRunning = false;
+      }
+    }
+
+    startPomoBtn.addEventListener('click', togglePomoTimer);
+    pausePomoBtn.addEventListener('click', () => { clearInterval(pomoTimer); isPomoRunning = false; });
+    resetPomoBtn.addEventListener('click', () => {
+      clearInterval(pomoTimer);
+      isPomoRunning = false;
+      pomoTime = 25 * 60;
+      updatePomoDisplay();
+    });
+
+    dismissBreakBtn.addEventListener('click', () => {
+      breakOverlay.style.display = 'none';
+      pomoTime = 25 * 60;
+      updatePomoDisplay();
+    });
+
+    // 2. WEB AUDIO SYNTHESIZER
+    let audioCtx = null;
+    let noiseNode = null;
+    let currentAudioMode = 'off';
+
+    function initAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    function stopAmbient() {
+      if (noiseNode) {
+        noiseNode.stop();
+        noiseNode.disconnect();
+        noiseNode = null;
+      }
+      currentAudioMode = 'off';
+      document.querySelectorAll('.audio-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('audioOffBtn').classList.add('active');
+    }
+
+    function playPinkNoise(type) {
+      stopAmbient();
+      initAudio();
+      currentAudioMode = type;
+
+      const bufferSize = audioCtx.sampleRate * 2;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+
+      let b0=0, b1=0, b2=0, b3=0, b4=0, b5=0, b6=0;
+      for (let i = 0; i < bufferSize; i++) {
+        let white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+        data[i] *= 0.05;
+        b6 = white * 0.115926;
+      }
+
+      noiseNode = audioCtx.createBufferSource();
+      noiseNode.buffer = buffer;
+      noiseNode.loop = true;
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = type === 'rain' ? 'lowpass' : 'bandpass';
+      filter.frequency.value = type === 'rain' ? 800 : 1200;
+
+      const gainNode = audioCtx.createGain();
+      gainNode.gain.value = 0.15;
+
+      noiseNode.connect(filter);
+      filter.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      noiseNode.start();
+    }
+
+    document.getElementById('audioOffBtn').addEventListener('click', stopAmbient);
+    document.getElementById('audioRainBtn').addEventListener('click', (e) => {
+      playPinkNoise('rain');
+      document.querySelectorAll('.audio-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+    });
+    document.getElementById('audioPinkBtn').addEventListener('click', (e) => {
+      playPinkNoise('pink');
+      document.querySelectorAll('.audio-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+    });
+
+    // 3. FEATURE 1: KEYBOARD SHORTCUTS (HOTKEYS)
+    document.addEventListener('keydown', (e) => {
+      // Don't trigger hotkeys if user is actively typing in an input or textarea
+      const tag = document.activeElement.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        togglePomoTimer();
+      } else if (e.altKey && e.key === '1') {
+        document.getElementById('tab1Btn').click();
+      } else if (e.altKey && e.key === '2') {
+        document.getElementById('tab2Btn').click();
+      } else if (e.altKey && e.key === '3') {
+        document.getElementById('tab3Btn').click();
+      } else if (e.altKey && e.key.toLowerCase() === 'm') {
+        if (currentAudioMode === 'off') {
+          document.getElementById('audioRainBtn').click();
+        } else {
+          stopAmbient();
+        }
+      }
+    });
+
+    // 4. BATTERY & VIEWPORT NAVIGATION
+    const batterySlider = document.getElementById('batterySlider');
+    const batteryPercent = document.getElementById('batteryPercent');
+
+    function updateBatteryUI(val) {
+      currentBattery = val;
+      batterySlider.value = val;
+      batteryPercent.textContent = `${val}%`;
+      batteryPercent.style.color = val < 35 ? '#ff477e' : (val < 65 ? '#ff9f1c' : '#00f5d4');
+      saveToStorage();
+    }
+    batterySlider.addEventListener('input', (e) => updateBatteryUI(parseInt(e.target.value)));
+    updateBatteryUI(currentBattery);
+
+    const tabs = document.querySelectorAll('.selector-btn');
+    const panels = document.querySelectorAll('.view-panel');
+    const orb = document.getElementById('visualOrb');
+    const badge = document.getElementById('statusBadge');
+    let gameActive = false;
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        const targetId = tab.getAttribute('data-target');
+        panels.forEach(p => p.classList.remove('active'));
+        document.getElementById(targetId).classList.add('active');
+
+        gameActive = (targetId === 'reset-panel');
+        if (gameActive) resizeCanvas();
+
+        badge.textContent = tab.getAttribute('data-badge');
+        badge.style.color = tab.getAttribute('data-color');
+        orb.style.background = tab.getAttribute('data-bg');
+        orb.style.boxShadow = `0 0 40px ${tab.getAttribute('data-color')}`;
+      });
+    });
+
+    // 5. FEATURE 2: QUICK NOTE STAMPER MECHANICS
+    const noteArea = document.getElementById('noteArea');
+    const quickNoteInput = document.getElementById('quickNoteInput');
+    const quickNoteBtn = document.getElementById('quickNoteBtn');
+
+    noteArea.value = notesData;
+    noteArea.addEventListener('input', saveToStorage);
+
+    function stampQuickNote() {
+      const text = quickNoteInput.value.trim();
+      if (text === '') return;
+
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const formattedNote = `\n[${timeStr}] ${text}`;
+      
+      noteArea.value = noteArea.value ? noteArea.value + formattedNote : formattedNote;
+      quickNoteInput.value = '';
+      saveToStorage();
+    }
+
+    quickNoteBtn.addEventListener('click', stampQuickNote);
+    quickNoteInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') stampQuickNote(); });
+
+    // 6. SYLLABUS REVISION TRACKER
+    const taskInput = document.getElementById('newTaskInput');
+    const subjectSelect = document.getElementById('subjectSelect');
+    const addTaskBtn = document.getElementById('addTaskBtn');
+    const taskListContainer = document.getElementById('taskListContainer');
+
+    function renderTasks() {
+      taskListContainer.innerHTML = '';
+      let completedCount = 0;
+
+      tasks.forEach(task => {
+        if (task.completed) completedCount++;
+        const item = document.createElement('div');
+        item.className = 'task-item';
+        item.innerHTML = `
+          <div class="task-left">
+            <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id})">
+            <span class="subject-tag">${task.subject}</span>
+            <span class="task-text ${task.completed ? 'completed' : ''}">${task.text}</span>
+          </div>
+          <button class="task-delete" onclick="deleteTask(${task.id})">✕</button>
+        `;
+        taskListContainer.appendChild(item);
+      });
+
+      const percent = tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0;
+      document.getElementById('progressPercent').textContent = `${percent}%`;
+      document.getElementById('progressFill').style.width = `${percent}%`;
+      saveToStorage();
+    }
+
+    function addTask() {
+      const text = taskInput.value.trim();
+      if(text !== '') {
+        tasks.push({ id: Date.now(), subject: subjectSelect.value, text: text, completed: false });
+        taskInput.value = '';
+        renderTasks();
+      }
+    }
+
+    addTaskBtn.addEventListener('click', addTask);
+    taskInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') addTask(); });
+    window.toggleTask = function(id) { tasks = tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t); renderTasks(); };
+    window.deleteTask = function(id) { tasks = tasks.filter(t => t.id !== id); renderTasks(); };
+    renderTasks();
+
+    // 7. STRESS-REACTIVE SANDBOX ENGINE
+    const canvas = document.getElementById('sandboxCanvas');
+    const ctx = canvas.getContext('2d');
+    const ventInput = document.getElementById('ventInput');
+    const ventBtn = document.getElementById('ventBtn');
+    let particles = [];
+    let isDrawing = false;
+
+    function resizeCanvas() {
+      canvas.width = canvas.parentNode.clientWidth;
+      canvas.height = canvas.parentNode.clientHeight;
+    }
+    window.addEventListener('resize', () => { if(gameActive) resizeCanvas(); });
+
+    class Particle {
+      constructor(x, y, forceColor = null) {
+        this.x = x;
+        this.y = y;
+        this.size = Math.random() * 4 + 2;
+        this.speedX = Math.random() * 4 - 2;
+        this.speedY = Math.random() * -3 - 1;
+        this.alpha = 1;
+        this.decay = Math.random() * 0.01 + 0.008;
+        this.color = forceColor || (currentBattery < 35 ? `hsl(${Math.random() * 40 + 190}, 100%, 65%)` : `hsl(${Math.random() * 35 + 15}, 100%, 60%)`);
+      }
+      update() { this.x += this.speedX; this.y += this.speedY; this.alpha -= this.decay; }
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = this.color;
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function spawnParticles(e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX || e.touches[0].clientX) - rect.left;
+      const y = (e.clientY || e.touches[0].clientY) - rect.top;
+      let count = currentBattery < 35 ? 6 : 3;
+      for(let i = 0; i < count; i++) { particles.push(new Particle(x, y)); }
+    }
+
+    canvas.addEventListener('mousedown', (e) => { isDrawing = true; spawnParticles(e); });
+    canvas.addEventListener('mousemove', (e) => { if(isDrawing) spawnParticles(e); });
+    window.addEventListener('mouseup', () => isDrawing = false);
+
+    function incinerateThought() {
+      const text = ventInput.value.trim();
+      if (text === '') return;
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      for (let i = 0; i < 60; i++) {
+        let p = new Particle(centerX, centerY, `hsl(${Math.random() * 40 + 330}, 100%, 65%)`);
+        p.speedX = Math.random() * 8 - 4;
+        p.speedY = Math.random() * 8 - 4;
+        particles.push(p);
+      }
+      ventInput.value = '';
+      updateBatteryUI(Math.min(100, currentBattery + 5));
+    }
+
+    ventBtn.addEventListener('click', incinerateThought);
+    ventInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') incinerateThought(); });
+
+    function animateParticles() {
+      if(gameActive) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.font = '12px Segoe UI';
+        ctx.textAlign = 'center';
+        ctx.fillText('Drag mouse or incinerate thoughts to decompress...', canvas.width / 2, canvas.height / 2);
+
+        for (let i = 0; i < particles.length; i++) {
+          particles[i].update();
+          particles[i].draw();
+          if (particles[i].alpha <= 0) {
+            particles.splice(i, 1);
+            i--;
+          }
+        }
+      }
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+  </script>
+</body>
+</html>
