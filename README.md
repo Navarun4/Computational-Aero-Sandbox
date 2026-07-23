@@ -1,4 +1,4 @@
-
+<img width="928" height="495" alt="image" src="https://github.com/user-attachments/assets/3b791e67-bf19-4a80-a134-f912ff0bad80" />
 # 1. 3D Cyberpunk Physics Engine (projectile_sim.py)
 A continuous numerical solver for ballistics.
 
@@ -92,6 +92,8 @@ Programming Language: Python 3.11+ — Leveraged for clean, high-level object-or
 
 
 
+
+
 Graphics Engine Framework: Pygame CE (Community Edition) — Used to manage the low-level multimedia hardware layer, window rendering, and real-time input matrices.
 
 
@@ -113,3 +115,14 @@ Trigonometric & Non-Linear Functions: Utilized math.sin(), math.cos(), and natur
 
 
 ![main.py](extremeskies.png)
+
+
+
+
+
+
+# Sanctuary
+
+Why this project?: This has been a recent project of mine and i did this to support or help out people in depression, anxiety or stress. The project is still under work as it has to be more optimised but i added things like pomodoro timer, taks organizer, calm sound effects and a stress reducer option too! 
+
+![main.py](sanctuary.png)
